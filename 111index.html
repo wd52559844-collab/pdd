@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>实时助力码大厅 · 共享版</title>
+    <style>
+        :root {
+            --primary: #FF3366;
+            --primary-bg: #FFF0F4;
+            --primary-border: #FFD1DF;
+            --green: #34C759;
+            --green-bg: #EDFAF1;
+            --green-border: #B4E4C2;
+            --red: #FF3B30;
+            --red-bg: #FFF0F0;
+            --red-border: #FFD4D4;
+            --blue: #007AFF;
+            --blue-bg: #F0F5FF;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F7;
+            --gray-200: #E8E8ED;
+            --gray-300: #D1D1D6;
+            --gray-400: #AEAFB6;
+            --gray-500: #8E8E93;
+            --gray-600: #636366;
+            --gray-700: #3A3A3C;
+            --gray-800: #2C2C2E;
+            --r-xs: 8px;
+            --r-sm: 12px;
+            --r-md: 16px;
+            --r-lg: 22px;
+            --r-xl: 28px;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif;
+            background: #F7F7F7;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 12px 12px 30px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .input-card {
+            border-radius: var(--r-lg);
+            padding: 18px 16px;
+        }
+        .input-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .input-title svg { width: 18px; height: 18px; color: var(--primary); }
+
+        .input-wrapper {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .input-field {
+            flex: 1;
+            background: var(--gray-100);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 40px;
+            padding: 14px 18px;
+            font-size: 17px;
+            font-family: 'SF Mono', 'Menlo', monospace;
+            font-weight: 600;
+            color: var(--gray-800);
+            outline: none;
+            transition: border 0.15s;
+        }
+        .input-field:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+        .input-field::placeholder {
+            font-weight: 400;
+            color: var(--gray-400);
+            font-size: 15px;
+        }
+        .paste-btn {
+            background: var(--gray-100);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 40px;
+            padding: 0 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.1s;
+            white-space: nowrap;
+        }
+        .paste-btn:active { background: var(--gray-200); }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-primary {
+            flex: 1;
+            background: var(--primary);
+            border: none;
+            border-radius: 40px;
+            padding: 14px 0;
+            color: #fff;
+            font-weight: 700;
+            font-size: 17px;
+            box-shadow: 0 5px 0 #a61c14, 0 6px 12px rgba(224,46,36,0.2);
+            cursor: pointer;
+            transition: all 0.08s;
+            text-align: center;
+        }
+        .btn-primary:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #a61c14, 0 4px 10px rgba(224,46,36,0.15);
+        }
+        .btn-secondary {
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 40px;
+            padding: 14px 20px;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.1s;
+            white-space: nowrap;
+        }
+        .btn-secondary:active { background: var(--gray-200); }
+
+        .stats-card {
+            padding: 16px 16px 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .guide-card {
+            padding: 16px 16px 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .guide-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .guide-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .guide-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .step-num {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .step-text {
+            font-size: 13px;
+            color: var(--gray-700);
+            line-height: 1.4;
+        }
+
+        .list-card { border-radius: var(--r-lg); }
+        .list-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px 12px;
+            border-bottom: 1px solid var(--gray-200);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .list-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .list-actions { display: flex; gap: 5px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight:500;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-gray { background: var(--gray-100); color: var(--gray-600); }
+
+        .list-body { padding: 12px 16px 16px; }
+
+        .group-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 0 8px;
+            color: var(--gray-500);
+        }
+        .group-label.green { color: var(--green); }
+        .group-label.red { color: var(--red); }
+
+        .code-list { list-style: none; }
+        .code-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 12px;
+            border-radius: var(--r-xs);
+            margin-bottom: 6px;
+            gap: 10px;
+        }
+        .code-item.unused { background: var(--green-bg); border: 1px solid var(--green-border); }
+        .code-item.used { background: var(--gray-50); border: 1px solid var(--gray-200); opacity: 0.7; }
+        .code-item-info { flex: 1; }
+        .code-item-num {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-800);
+            letter-spacing: 2px;
+        }
+        .code-item-time { 
+            font-size: 11px; 
+            color: var(--gray-400); 
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .code-item-actions { display: flex; gap: 6px; align-items: center; }
+        .btn-jump {
+            background: var(--green);
+            color: #fff !important;
+            padding: 7px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 6px rgba(52,199,89,0.2);
+        }
+        .btn-used {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .used-tag {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            color: var(--red);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-400);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body { background: #000; }
+            .card { background: #1C1C1E; }
+            .input-title { color: #E5E5EA; }
+            .input-field { background: #2C2C2E; border-color: #3A3A3C; color: #E5E5EA; }
+            .input-field:focus { border-color: var(--primary); background: #1C1C1E; }
+            .paste-btn { background: #2C2C2E; border-color: #3A3A3C; color: var(--primary); }
+            .btn-secondary { background: #2C2C2E; border-color: #3A3A3C; color: #AEAEB2; }
+            .stats-card { border-color: #3A3A3C; }
+            .stat-value { color: #E5E5EA; }
+            .guide-card { border-color: #3A3A3C; }
+            .guide-title { color: #AEAEB2; }
+            .step-text { color: #D1D1D6; }
+            .list-head { border-color: #3A3A3C; }
+            .list-title { color: #E5E5EA; }
+            .btn-gray { background: #2C2C2E; color: #AEAEB2; }
+            .code-item.unused { background: #1A2E1E; border-color: #2E3A28; }
+            .code-item.used { background: #2C2C2E; border-color: #3A3A3C; }
+            .code-item-num { color: #E5E5EA; }
+            .group-label { color: #8E8E93; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- 手动输入卡片 -->
+    <div class="card input-card">
+        <div class="input-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            手动输入助力码
+        </div>
+        <div class="input-wrapper">
+            <input type="text" id="codeInput" class="input-field" placeholder="输入或粘贴助力码" value="">
+            <button class="paste-btn" id="pasteBtn">粘贴</button>
+        </div>
+        <div class="action-btns">
+            <button class="btn-primary" id="confirmBtn">立即提交</button>
+            <button class="btn-secondary" id="clearInputBtn">清空</button>
+        </div>
+        <!-- 每日限额提示文字已移除，但限制功能依然有效 -->
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="card stats-card">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-label">总助力码</span>
+                <span class="stat-value" id="totalCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">可用</span>
+                <span class="stat-value" id="unusedTotalCount" style="color: var(--green);">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">已用</span>
+                <span class="stat-value" id="usedTotalCount" style="color: var(--red);">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">今日提交</span>
+                <span class="stat-value" id="todaySubmitCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用说明卡片（移除了第5条） -->
+    <div class="card guide-card">
+        <div class="guide-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            使用说明
+        </div>
+        <div class="guide-steps">
+            <div class="guide-step"><span class="step-num">1</span><span class="step-text">输入9位邀请码提交，等待他人使用</span></div>
+            <div class="guide-step"><span class="step-num">2</span><span class="step-text">在列表中点击“跳转”按钮，自动复制并打开拼多多</span></div>
+            <div class="guide-step"><span class="step-num">3</span><span class="step-text">在拼多多搜索框粘贴邀请码，完成互助</span></div>
+            <div class="guide-step"><span class="step-num">4</span><span class="step-text">每个账号每天是新一轮，可多账号提高成功率</span></div>
+        </div>
+    </div>
+
+    <!-- 列表卡片 -->
+    <div class="card list-card">
+        <div class="list-head">
+            <div class="list-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <line x1="8" y1="6" x2="21" y2="6"/>
+                    <line x1="8" y1="12" x2="21" y2="12"/>
+                    <line x1="8" y1="18" x2="21" y2="18"/>
+                    <line x1="3" y1="6" x2="3.01" y2="6"/>
+                    <line x1="3" y1="12" x2="3.01" y2="12"/>
+                    <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                实时助力码大厅
+            </div>
+            <div class="list-actions">
+                <button class="btn btn-gray" id="refreshBtn">刷新</button>
+            </div>
+        </div>
+        <div class="list-body">
+            <div id="numberList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 引入 Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+    (function(){
+        // ==================== 🔑 请把你的 Firebase 配置粘贴到这里 ====================
+       const firebaseConfig = {
+    apiKey: "AIzaSyAsP6paeq2SlmeJWFfiJD-8V7DaAHpOlsY",
+    authDomain: "pdd-bag.firebaseapp.com",
+    projectId: "pdd-bag",
+    storageBucket: "pdd-bag.firebasestorage.app",
+    messagingSenderId: "92311028093",
+    appId: "1:92311028093:web:c78e3edd4a1be437838c14",
+    measurementId: "G-9QEPSD51TF"
+  };
+
+
+        // ================================================================
+
+        // 初始化 Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // 图标
+        const I = {
+            check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            x: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+            arrow: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>`,
+        };
+
+        // DOM 元素
+        const codeInput = document.getElementById('codeInput');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const clearInputBtn = document.getElementById('clearInputBtn');
+        const totalCountSpan = document.getElementById('totalCount');
+        const unusedTotalCountSpan = document.getElementById('unusedTotalCount');
+        const usedTotalCountSpan = document.getElementById('usedTotalCount');
+        const todaySubmitCountSpan = document.getElementById('todaySubmitCount');
+        const numberListDiv = document.getElementById('numberList');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        // ---------- 设备每日提交限制 (30个，功能保留，但不显示文字) ----------
+        const DAILY_LIMIT = 30;
+        const STORAGE_KEY_DAILY = 'pdd_daily_submit';
+        
+        function getTodayStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        }
+        
+        function getDailySubmitCount() {
+            const today = getTodayStr();
+            try {
+                const data = JSON.parse(localStorage.getItem(STORAGE_KEY_DAILY) || '{}');
+                if (data.date !== today) {
+                    return 0;
+                }
+                return data.count || 0;
+            } catch { return 0; }
+        }
+        
+        function incrementDailySubmitCount() {
+            const today = getTodayStr();
+            const current = getDailySubmitCount();
+            const newCount = current + 1;
+            localStorage.setItem(STORAGE_KEY_DAILY, JSON.stringify({ date: today, count: newCount }));
+            return newCount;
+        }
+
+        // ---------- 自动清理昨天及之前的数据 ----------
+        async function cleanOldRecords() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStart = today.getTime();
+            
+            const snapshot = await codesRef.once('value');
+            const data = snapshot.val();
+            if (!data) return;
+            
+            const updates = {};
+            let hasOld = false;
+            Object.entries(data).forEach(([id, record]) => {
+                if (record.timestamp && record.timestamp < todayStart) {
+                    updates[`assist_codes/${id}`] = null;
+                    hasOld = true;
+                }
+            });
+            
+            if (hasOld) {
+                await database.ref().update(updates);
+                console.log('已清理过期数据');
+            }
+        }
+
+        // 匿名登录
+        auth.signInAnonymously().catch(e => console.warn("匿名登录失败:", e));
+
+        // 数据库引用
+        const codesRef = database.ref('assist_codes');
+
+        // 先清理旧数据，再监听实时更新
+        cleanOldRecords().then(() => {
+            codesRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                const records = [];
+                if (data) {
+                    Object.entries(data).forEach(([id, value]) => {
+                        records.push({ id, ...value });
+                    });
+                }
+                renderAll(records);
+            });
+        });
+
+        // 提交新助力码
+        function addRecord(code) {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('网络初始化中，请稍后再试');
+                return;
+            }
+            
+            // 检查每日限额（功能保留，超限弹窗提示）
+            const todayUsed = getDailySubmitCount();
+            if (todayUsed >= DAILY_LIMIT) {
+                alert(`今日提交已达上限（${DAILY_LIMIT}个），明天再来吧`);
+                return;
+            }
+            
+            // 检查是否重复
+            codesRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                let exists = false;
+                if (data) {
+                    exists = Object.values(data).some(r => r.number === code);
+                }
+                if (!exists) {
+                    const newRef = codesRef.push();
+                    newRef.set({
+                        number: code,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        used: false,
+                        jumpCount: 0,
+                        creatorId: user.uid
+                    });
+                    incrementDailySubmitCount();
+                    codeInput.value = code;
+                } else {
+                    alert('这个助力码已经在大厅里了！');
+                }
+            });
+        }
+
+        // 处理跳转
+        function handleJump(code, id) {
+            const codeRef = database.ref(`assist_codes/${id}`);
+            codeRef.once('value', (snapshot) => {
+                const rec = snapshot.val();
+                if (rec) {
+                    const newJumpCount = (rec.jumpCount || 0) + 1;
+                    codeRef.update({
+                        jumpCount: newJumpCount,
+                        used: newJumpCount >= 1
+                    });
+                }
+            });
+            window.location.href = `pinduoduo://com.xunmeng.pinduoduo/search_result.html?search_key=${code}`;
+        }
+
+        // 手动标记已用
+        function markUsed(id) {
+            const codeRef = database.ref(`assist_codes/${id}`);
+            codeRef.update({ used: true });
+        }
+
+        // 格式化相对时间
+        function formatRelativeTime(timestamp) {
+            if (!timestamp) return '刚刚';
+            const now = Date.now();
+            const diff = now - timestamp;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            if (seconds < 60) return '刚刚';
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days === 1) return '昨天';
+            if (days < 7) return `${days}天前`;
+            const date = new Date(timestamp);
+            return `${date.getMonth()+1}/${date.getDate()}`;
+        }
+
+        // 渲染统计和列表
+        function renderAll(records) {
+            // 按时间倒序
+            records.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            const total = records.length;
+            const unused = records.filter(r => !r.used).length;
+            const used = records.filter(r => r.used).length;
+
+            const today = new Date(); today.setHours(0,0,0,0);
+            const todayStart = today.getTime();
+            const todaySubmit = records.filter(r => (r.timestamp || 0) >= todayStart).length;
+
+            totalCountSpan.textContent = total;
+            unusedTotalCountSpan.textContent = unused;
+            usedTotalCountSpan.textContent = used;
+            todaySubmitCountSpan.textContent = todaySubmit;
+
+            if (records.length === 0) {
+                numberListDiv.innerHTML = `<div class="empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40" style="margin-bottom:10px;opacity:0.3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <p>暂无助力码<br><span style="color:#AEAFB6">输入助力码并提交，大家就能看到了</span></p>
+                </div>`;
+                return;
+            }
+
+            const unusedRecords = records.filter(r => !r.used);
+            const usedRecords = records.filter(r => r.used);
+
+            let html = '';
+            if (unusedRecords.length) {
+                html += `<div class="group-label green">${I.check} 可用助力码</div><ul class="code-list">`;
+                unusedRecords.forEach(item => {
+                    const timeStr = formatRelativeTime(item.timestamp);
+                    const shown = item.number.slice(0,3) + ' ** ' + item.number.slice(5);
+                    const url = `pinduoduo://com.xunmeng.pinduoduo/search_result.html?search_key=${item.number}`;
+                    html += `<li class="code-item unused">
+                        <div class="code-item-info">
+                            <div class="code-item-num">${shown}</div>
+                            <div class="code-item-time">${timeStr}</div>
+                        </div>
+                        <div class="code-item-actions">
+                            <a class="btn-jump" href="${url}" data-id="${item.id}" data-code="${item.number}">${I.arrow} 跳转</a>
+                            <button class="btn-used" data-id="${item.id}">已用</button>
+                        </div>
+                    </li>`;
+                });
+                html += '</ul>';
+            }
+            if (usedRecords.length) {
+                html += `<div class="group-label red">${I.x} 已使用</div><ul class="code-list">`;
+                usedRecords.forEach(item => {
+                    const timeStr = formatRelativeTime(item.timestamp);
+                    html += `<li class="code-item used">
+                        <div class="code-item-info">
+                            <div class="code-item-num">${item.number}</div>
+                            <div class="code-item-time">${timeStr}</div>
+                        </div>
+                        <div class="code-item-actions">
+                            <div class="used-tag">${I.x} 已使用</div>
+                        </div>
+                    </li>`;
+                });
+                html += '</ul>';
+            }
+            numberListDiv.innerHTML = html;
+
+            // 绑定跳转事件
+            document.querySelectorAll('.btn-jump').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const code = btn.dataset.code;
+                    const id = btn.dataset.id;
+                    handleJump(code, id);
+                });
+            });
+            // 绑定手动已用按钮
+            document.querySelectorAll('.btn-used').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = btn.dataset.id;
+                    markUsed(id);
+                });
+            });
+        }
+
+        // 提交处理
+        function handleConfirm() {
+            let raw = codeInput.value.trim();
+            if (!raw) { alert('请输入助力码'); return; }
+            const match = raw.match(/[A-Za-z0-9]{4,}/);
+            if (match) {
+                const code = match[0].toUpperCase();
+                addRecord(code);
+            } else {
+                alert('未检测到有效助力码（至少4位字母数字）');
+            }
+        }
+
+        // 粘贴
+        async function handlePaste() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) codeInput.value = text.trim();
+            } catch {
+                alert('无法读取剪贴板，请手动粘贴');
+            }
+        }
+
+        // 事件绑定
+        confirmBtn.addEventListener('click', handleConfirm);
+        clearInputBtn.addEventListener('click', () => { codeInput.value = ''; });
+        pasteBtn.addEventListener('click', handlePaste);
+        refreshBtn.addEventListener('click', () => {
+            codesRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                const records = [];
+                if (data) {
+                    Object.entries(data).forEach(([id, value]) => {
+                        records.push({ id, ...value });
+                    });
+                }
+                renderAll(records);
+            });
+        });
+        codeInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleConfirm(); });
+
+    })();
+</script>
+</body>
+</html>
